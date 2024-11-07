@@ -1,0 +1,11 @@
+/build
+/.vscode
+/.cache
+/assets
+*.o
+/build_sys/src
+/build_sys/include
+/build_sys/init
+/build_sys/builder
+/build_sys/main
+/build_sys/.vscode
