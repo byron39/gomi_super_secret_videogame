@@ -22,6 +22,8 @@ using std::unique_ptr;
 using std::unordered_map;
 using std::vector;
 
+using std::make_unique;
+
 #define let const auto // we do a little trolling
 #define mut auto       // im landing in hell for this
 

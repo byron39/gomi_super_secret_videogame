@@ -8,6 +8,7 @@ class Arrow {
   node<Arrow *> key_node; // used for removal
 public:
   Arrow();
+  void render(Texture *text);
 };
 
 class ArrowManager {
@@ -17,4 +18,5 @@ class ArrowManager {
 public:
   ArrowManager();
   void add_new(Rectangle player_pos);
+  void render();
 };

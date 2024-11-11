@@ -1,0 +1,28 @@
+Safefile:
+- static class with lots of members that gets updated by Game actors
+  (last_pos, hp, inventory, last_character)
+
+- make a dotfile and encrypt the contents 
+- encryption key gets stored in the exe (gets generated upon first startup) (xd: embedding utility)
+
+Ressource Files:
+- embedd via xd : extended load and dump utility
+
+
+
+TODO: 
+- read xd docs and figure out how to load files into binary arrays
+- add a way to parse files as binary input stream to images and textures
+  do the same with sound if possible
+
+- SafeState could then also be to be embedded but that would make updating really difficult, 
+  by just adding a button to get load another Safefile from a previous install, 
+  add warning to not paste new install over the old one
+
+- decide on a file structure for install directory and pathing \\\\!
+
+
+
+Updates:
+external script or exe that pulls a new version from github or itch
+new exe will be prebuilt on github
