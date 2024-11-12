@@ -1,0 +1,6 @@
+[CompilerOpts]
+optimisations = 0
+debug = true
+output = "main"
+threads = 4
+libraries = "raylib"

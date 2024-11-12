@@ -16,7 +16,7 @@ class Gamestate {
   unique_ptr<Time> time;
   vector<i32> data;
 
-  void update() {
+  void loop() {
     while (!WindowShouldClose()) {
       player->update();
       this->render();
@@ -50,7 +50,7 @@ public:
     camera.rotation = 0;
     camera.offset = {screenWidth / 2.0, screenHeight / 2.0};
 
-    this->update();
+    this->loop();
   }
 };
 

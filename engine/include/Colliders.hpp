@@ -1,0 +1,35 @@
+#pragma once
+
+#include "types.hpp"
+#include <raylib.h>
+
+typedef enum ColliderType {
+  NONE = 0,
+  POLYGON = 1,
+  RECTANGLE = 2,
+  CIRCLE = 3,
+} ColliderType;
+
+const char *collider_names[4] = {"No Collider", "Polygon Collider",
+                                 "Rectangle Collider", "Circle Collider"};
+
+class Collider {
+  ColliderType type;
+};
+
+typedef struct None : Collider {
+  // don't you fucking dare question this
+} None;
+
+typedef struct Circle : Collider {
+  Vector2 center;
+  f32 radius;
+} Circle;
+
+typedef struct rectangle : Collider {
+  i32 top, left, width, height;
+} rectangle;
+
+typedef struct Polygon : Collider {
+  vector<Vector2> vertecies;
+} Polygon;
