@@ -2,5 +2,5 @@
 optimisations = 0
 debug = true
 output = "main"
-threads = 4
+threads = 8
 libraries = "raylib"
