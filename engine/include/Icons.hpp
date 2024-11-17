@@ -1,4 +1,5 @@
 #pragma once
+#include "list.hpp"
 #include "types.hpp"
 #include <raylib.h>
 
@@ -11,7 +12,10 @@ public:
   i32 fontsize;
   Texture texture;
   i32 BorderThickness;
-  Icon(string path, i32 x, i32 y);
+  node<Icon *> *ref;
 
   void draw();
+
+  Icon(string path, i32 x, i32 y);
+  void make_ref(node<Icon *> *reference);
 };

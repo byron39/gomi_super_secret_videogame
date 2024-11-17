@@ -15,9 +15,11 @@ template <typename T> class DLinkedList {
 
 public:
   DLinkedList() {
+    head = new node<T>;
     this->head->last = nullptr;
     this->head->next = nullptr;
     this->head->data = nullptr;
+    cout << "\nDLinkedList created \n" << endl;
   };
   void erase(node<T> *n) {
     n->last->next = n->next;
@@ -31,14 +33,14 @@ public:
     new_node->last = head;
     new_node->data = nullptr;
     new_node->next = nullptr;
-    head->next = new_node;
+    head = new_node;
 
     return head->last;
   };
   void foreach (std::function<void(T)> func) {
     node<T> *tmp = head;
     while (tmp->last) {
-      func(tmp->data);
+      func(tmp->last->data);
       tmp = tmp->last;
     }
   };

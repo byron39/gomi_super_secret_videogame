@@ -18,6 +18,8 @@ Icon::Icon(string path, i32 x, i32 y) {
   BorderThickness = 3;
 }
 
+void Icon::make_ref(node<Icon *> *reference) { ref = reference; }
+
 void Icon::draw() {
 
   // this is kind of a hack but ehhh

@@ -10,9 +10,6 @@ typedef enum ColliderType {
   CIRCLE = 3,
 } ColliderType;
 
-const char *collider_names[4] = {"No Collider", "Polygon Collider",
-                                 "Rectangle Collider", "Circle Collider"};
-
 class Collider {
   ColliderType type;
 };

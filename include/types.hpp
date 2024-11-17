@@ -1,9 +1,11 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <string.h>
 #include <string>
 #include <unordered_map>
 #include <vector>

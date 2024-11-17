@@ -25,6 +25,7 @@ using std::vector;
 
 namespace fs = std::filesystem;
 
+using std::make_shared;
 using std::make_unique;
 
 #define let const auto // we do a little trolling

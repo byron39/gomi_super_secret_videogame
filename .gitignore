@@ -9,3 +9,12 @@
 /build_sys/builder
 /build_sys/main
 /build_sys/.vscode
+/engine/main
+/engine/builder
+/src/main
+/src/builder
+/src/player
+main
+builder
+/engine/build
+/engine/.cache
