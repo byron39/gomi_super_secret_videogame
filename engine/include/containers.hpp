@@ -2,6 +2,7 @@
 
 #include "GameObjects.hpp"
 #include "Icons.hpp"
+#include "selectable.hpp"
 #include "types.hpp"
 #include <raylib.h>
 
@@ -9,7 +10,7 @@ class GameObjectContainer {
   vector<DLinkedList<GameObject *>> Layers;
 
 public:
-  void add_new(f32 x, f32 y, u32 Layer);
+  GameObject *add_new(f32 x, f32 y, u8 Layer);
 
   // this can get really, really expensive, so be careful
   void foreach (std::function<void(GameObject *)> func);

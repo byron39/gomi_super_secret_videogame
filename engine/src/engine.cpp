@@ -39,7 +39,7 @@ EngineState::EngineState() {
       if (endswith(entry.path(), ".png")) {
         auto icon = icons->add_new(entry.path(), left_offset * BOX_WIDTH,
                                    top_offset * BOX_WIDTH);
-        selection->new_object(icon, ICON);
+        selection->new_object<Icon>(icon, ICON);
         left_offset++;
         cout << left_offset * BOX_WIDTH << endl;
         if (left_offset * BOX_WIDTH >= BOX_WIDTH * 2) {

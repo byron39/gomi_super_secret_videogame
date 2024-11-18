@@ -4,16 +4,6 @@
 #include <cstring>
 #include <filesystem>
 #include <raylib.h>
-
-class UIDGenerator {
-  static u64 current;
-
-public:
-  static u64 GetNewUid() { return current++; }
-};
-
-u64 UIDGenerator::current = 0;
-
 class Scene {
   map<u64, GameObject *> Objects;
 };

@@ -17,6 +17,13 @@ Icon *IconContainer::add_new(string path, i32 x, i32 y) {
   return newIcon;
 }
 
+GameObject *GameObjectContainer::add_new(f32 x, f32 y, u8 Layer) {
+  // TODO: Do this shit please i beg of you, i know its painful but you can't
+  // procrastinate on it
+
+  return nullptr;
+}
+
 void GameObjectContainer::foreach (std::function<void(GameObject *)> func) {
   for (auto layer : Layers) {
     layer.foreach (func);
