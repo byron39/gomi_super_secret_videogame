@@ -21,6 +21,14 @@ GameObject *GameObjectContainer::add_new(f32 x, f32 y, u8 Layer) {
   // TODO: Do this shit please i beg of you, i know its painful but you can't
   // procrastinate on it
 
+  if(Layer < Layers.size()){
+    Layers.reserve(Layers.size()-Layer);
+  }
+  auto Object = new GameObject(x, y, );
+
+
+
+
   return nullptr;
 }
 

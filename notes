@@ -28,4 +28,7 @@ external script or exe that pulls a new version from github or itch
 new version will be prebuilt on github
 
 Engine for building maps:
-  objects
+  Camera that accounts for the gameObjects i.e. scale, Position of newly placed objects (start at a scale of texture 1:1, 476:476),
+
+  Maybe just render everything and don't worry about overdrawing in the engine?
+  Figure out the file format for saving a scene   
