@@ -30,6 +30,7 @@ public:
   node<T> *append(T new_data) {
     head->data = new_data;
     node<T> *new_node = new node<T>;
+    head->next = new_node;
     new_node->last = head;
     new_node->data = nullptr;
     new_node->next = nullptr;
