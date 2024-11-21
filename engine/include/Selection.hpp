@@ -14,13 +14,16 @@ class Selection {
   DLinkedList<Selectable *> Objects; // all objects get added here
 
   Selectable *Selected = nullptr;
+  bool isSelected;
+  Camera2D *camera;
 
   shared_ptr<GameObjectContainer> GameObjectsRef;
   shared_ptr<IconContainer> IconsRef;
 
 public:
   u8 currentLayer;
-  Selection(shared_ptr<GameObjectContainer> GOR, shared_ptr<IconContainer> IR);
+  Selection(shared_ptr<GameObjectContainer> GOR, shared_ptr<IconContainer> IR,
+            Camera2D *cameraRef);
 
   void update(Rectangle *selectionWindow);
 

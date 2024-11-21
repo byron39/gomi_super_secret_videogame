@@ -7,15 +7,15 @@
 #include <raylib.h>
 
 class GameObjectContainer {
-  vector<DLinkedList<GameObject *>> Layers;
+  vector<DLinkedList<GameObject *> *> Layers;
 
 public:
-  GameObject *add_new(f32 x, f32 y, u8 Layer);
+  GameObject *add_new(Icon *icon, Camera2D *camera, u8 Layer);
 
   // this can get really, really expensive, so be careful
   void foreach (std::function<void(GameObject *)> func);
 
-  void draw();
+  void draw(Camera2D *camera);
 };
 
 class IconContainer {

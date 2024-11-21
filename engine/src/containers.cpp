@@ -1,4 +1,5 @@
 #include "../include/containers.hpp"
+#include <raylib.h>
 
 // don't show this to anyone i beg of you
 void IconContainer::foreach (std::function<void(Icon *)> func) {
@@ -17,34 +18,41 @@ Icon *IconContainer::add_new(string path, i32 x, i32 y) {
   return newIcon;
 }
 
-GameObject *GameObjectContainer::add_new(f32 x, f32 y, u8 Layer) {
-  // TODO: Do this shit please i beg of you, i know its painful but you can't
-  // procrastinate on it
-
-  if(Layer < Layers.size()){
-    Layers.reserve(Layers.size()-Layer);
+GameObject *GameObjectContainer::add_new(Icon *icon, Camera2D *camera,
+                                         u8 Layer) {
+  if (Layer >= Layers.size()) {
+    for (i32 i = Layers.size(); i <= Layer; i++) {
+      Layers.push_back(new DLinkedList<GameObject *>());
+    }
   }
-  auto Object = new GameObject(x, y, );
 
-
-
-
-  return nullptr;
+  Vector2 mouse = GetMousePosition();
+  auto newObject = new GameObject(GetScreenToWorld2D(mouse, *camera),
+                                  &icon->texture, icon->text, Layer);
+  auto ref = Layers[Layer]->append(newObject);
+  newObject->ObjectListKey = ref;
+  return newObject;
 }
 
 void GameObjectContainer::foreach (std::function<void(GameObject *)> func) {
   for (auto layer : Layers) {
-    layer.foreach (func);
+    layer->foreach (func);
   }
 }
 
-void GameObjectContainer::draw() {
+void GameObjectContainer::draw(Camera2D *camera) {
+
   for (auto layer : Layers) {
-    layer.foreach ([](GameObject *obj) {
+    layer->foreach ([camera](GameObject *obj) {
+      Vector2 screen_pos =
+          GetWorldToScreen2D({obj->matrix.x, obj->matrix.y}, *camera);
+      Rectangle drawMatrix = {screen_pos.x, screen_pos.y,
+                              obj->matrix.width * camera->zoom,
+                              obj->matrix.height * camera->zoom};
       DrawTexturePro(
           *obj->texture,
           {0, 0, (f32)obj->texture->width, (f32)obj->texture->height},
-          obj->matrix, {0, 0}, obj->rotation, RAYWHITE);
+          drawMatrix, {0, 0}, obj->rotation, RAYWHITE);
     });
   }
 }

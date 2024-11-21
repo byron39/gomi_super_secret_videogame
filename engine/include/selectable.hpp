@@ -10,5 +10,5 @@ typedef struct Selectable {
 public:
   SelectableType type;
   void *ptr;
-  node<Selectable *> *key; // delete
+  node<Selectable *> *key;
 } Selectable;

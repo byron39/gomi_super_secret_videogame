@@ -1,0 +1,29 @@
+Hackmen failed to converse for like 2 minutes straight
+
+Greg got muted due to hackmen hearing himself trough his mic
+
+Hackmen then summarised the story in the google doc
+
+Short talk about selling our souls
+
+Hackmen started yapping about tiddies and ass-cheeks
+
+talk about map-design:
+- Islands/Biomes with different themes corresponding to the bosses
+- a few levels per Biome
+  - first levels introduce new mechanic 
+  - later levels allow the player to make use of those mechanics
+- Overview (whole)map jumping into smaller view of the Stage by clicking on it
+
+
+talk about other characters
+- for now no multiple playable characters, but maybe in the future
+  (i can already smell the refactor of the entire game for)
+- vtuber friends appear as npcs, not bosses
+
+Story Elements that won't get changed:
+- Araa as main antagonist
+- Gomi is boy
+- Gomi is gone for some time 
+- kevin summons araa 
+- gomi gets cut off a lot

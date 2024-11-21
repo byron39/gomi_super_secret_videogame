@@ -4,7 +4,7 @@
 #include "types.hpp"
 #include <raylib.h>
 
-#define BOX_WIDTH 512
+#define BOX_WIDTH 256
 
 class Icon : public Selectable {
 public:

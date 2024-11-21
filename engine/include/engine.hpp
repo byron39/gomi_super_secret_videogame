@@ -14,8 +14,10 @@ class EngineState {
   shared_ptr<IconContainer> icons;
   unique_ptr<Selection> selection;
   Rectangle selectionWindow;
+  Camera2D SceneCam;
 
 public:
   EngineState();
+  ~EngineState();
   void loop();
 };

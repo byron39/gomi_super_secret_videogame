@@ -1,18 +1,18 @@
 #include "../include/Selection.hpp"
-#include "GameObjects.hpp"
-#include "Icons.hpp"
 
 Selection::Selection(shared_ptr<GameObjectContainer> GOR,
-                     shared_ptr<IconContainer> IR) {
+                     shared_ptr<IconContainer> IR, Camera2D *cameraRef) {
   GameObjectsRef = GOR;
   IconsRef = IR;
-  Selected = new Selectable();
+  Selected = new Selectable;
   currentLayer = 0;
+  camera = cameraRef;
+  isSelected = false;
 }
 
 void Selection::update(Rectangle *selectionWindow) {
 
-  if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+  if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !isSelected) {
     Vector2 Mouse = GetMousePosition();
     Objects.foreach ([this, Mouse](Selectable *object) {
       switch (object->type) {
@@ -20,6 +20,7 @@ void Selection::update(Rectangle *selectionWindow) {
         if (CheckCollisionPointRec(Mouse, ((Icon *)object->ptr)->scale)) {
           this->Selected->ptr = (Selectable *)object->ptr;
           this->Selected->type = ICON;
+          this->isSelected = true;
         }
         break;
       case OBJECT:
@@ -28,13 +29,14 @@ void Selection::update(Rectangle *selectionWindow) {
           this->Selected->ptr = (Selectable *)object->ptr;
           this->Selected->type = OBJECT;
           this->Selected->key = object->key;
+          this->isSelected = true;
         }
         break;
       }
     });
   }
 
-  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && Selected) {
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && Selected && isSelected) {
     Vector2 Mouse = GetMousePosition();
     Rectangle WindowRec = {0, 0, (f32)GetScreenWidth(), (f32)GetScreenHeight()};
     switch (Selected->type) {
@@ -42,7 +44,8 @@ void Selection::update(Rectangle *selectionWindow) {
       if (!CheckCollisionPointRec(Mouse, *selectionWindow) &&
           CheckCollisionPointRec(Mouse, WindowRec)) {
         auto p = (Icon *)Selected->ptr;
-        GameObjectsRef->add_new(p->scale.x, p->scale.y, currentLayer);
+        GameObjectsRef->add_new(p, camera, currentLayer);
+        isSelected = false;
       }
       break;
     case OBJECT:

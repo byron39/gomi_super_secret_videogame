@@ -12,11 +12,14 @@
 class GameObject : public Selectable {
 public:
   Rectangle matrix;
+  Vector2 scale;
   f32 rotation;
   boost::optional<Collider> collider;
   string texture_path;
   Texture *texture;
-  u64 LayerID, UID;
+  u64 UID;
+  u8 LayerID;
+  node<GameObject *> *ObjectListKey;
 
-  GameObject(f32 x, f32 y, Texture *textureRef, string &path);
+  GameObject(Vector2 pos, Texture *textureRef, string &textPath, u8 Layer);
 };
