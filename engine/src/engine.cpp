@@ -44,11 +44,13 @@ EngineState::EngineState() {
   SetTargetFPS(60);
 
   // sweet mother of jesus
+  TextureIcon* last = NULL;
   for (const auto &entry : fs::directory_iterator(path)) {
     if (entry.is_regular_file()) {
       if (endswith(entry.path(), ".png")) {
         auto icon = icons->add_new(entry.path(), left_offset * BOX_WIDTH,
                                    top_offset * BOX_WIDTH);
+        last = icon;
         selection->new_object<TextureIcon>(icon, ICON);
         left_offset++;
         if (left_offset * BOX_WIDTH >= BOX_WIDTH * 2) {
@@ -59,10 +61,19 @@ EngineState::EngineState() {
     }
   }
 
+  if (last) {
+    Objects->add_new(last, &UICam, 1);
+    Objects->add_new(last, &UICam, 2);
+  }
+
   this->loop();
 }
 
 EngineState::~EngineState() {
+
+  Serializer::ToToml(*this->Objects.get(), *this->icons.get());
+
+
   this->selection.reset();
   this->Objects->foreach ([](GameObject *obj) {
     delete obj;

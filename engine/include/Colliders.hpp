@@ -11,7 +11,8 @@ typedef enum ColliderType {
 } ColliderType;
 
 class Collider {
-  ColliderType type;
+  public:
+    ColliderType type;
 };
 
 typedef struct None : Collider {

@@ -1,7 +1,6 @@
 #include "../include/GameObjects.hpp"
 
-GameObject::GameObject(Vector2 pos, Texture *textureRef, string &textPath,
-                       u8 Layer) {
+GameObject::GameObject(Vector2 pos, Texture *textureRef, string &textPath, u8 Layer) {
   this->texture = textureRef;
   this->matrix.x = pos.x;
   this->matrix.y = pos.y;

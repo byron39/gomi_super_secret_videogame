@@ -6,8 +6,8 @@
 #include "raylib.h"
 #include <memory>
 
-const i32 screenWidth = 2000;
-const i32 screenHeight = 1200;
+i32 screenWidth = 2000;
+i32 screenHeight = 1200;
 
 class Gamestate {
   Camera2D camera;
@@ -43,6 +43,12 @@ public:
   Gamestate() {
     data = init();
     InitWindow(screenWidth, screenHeight, "");
+
+    int mon_id = GetCurrentMonitor();
+    screenWidth  = GetMonitorWidth(mon_id) / 2;
+    screenHeight = GetMonitorHeight(mon_id) / 2;
+    SetWindowSize(screenWidth, screenHeight);
+
     time = std::make_unique<Time>(data[0]);
     this->player = std::make_unique<Player>(time.get());
     this->map = std::make_unique<Map>();

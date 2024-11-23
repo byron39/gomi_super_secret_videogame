@@ -4,6 +4,7 @@
 #include "Selection.hpp"
 #include "containers.hpp"
 #include "list.hpp"
+#include "Serializer.hpp"
 #include "types.hpp"
 #include "utils.hpp"
 #include "windowbar.hpp"
