@@ -5,6 +5,7 @@
 #include "list.hpp"
 #include "selectable.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 #include <boost/static_assert.hpp>
 #include <memory>
 #include <raylib.h>
@@ -24,8 +25,9 @@ public:
   u8 currentLayer;
   Selection(shared_ptr<GameObjectContainer> GOR, shared_ptr<IconContainer> IR,
             Camera2D *cameraRef);
+  ~Selection();
 
-  void update(Rectangle *selectionWindow);
+  void update(Rectangle *selectionWindow, bool IconsSeletable);
 
   template <typename ObjectType>
   node<Selectable *> *new_object(Selectable *newObject, SelectableType Type) {

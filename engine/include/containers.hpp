@@ -10,7 +10,7 @@ class GameObjectContainer {
   vector<DLinkedList<GameObject *> *> Layers;
 
 public:
-  GameObject *add_new(Icon *icon, Camera2D *camera, u8 Layer);
+  GameObject *add_new(TextureIcon *icon, Camera2D *camera, u8 Layer);
 
   // this can get really, really expensive, so be careful
   void foreach (std::function<void(GameObject *)> func);
@@ -19,12 +19,12 @@ public:
 };
 
 class IconContainer {
-  DLinkedList<Icon *> Icons;
+  DLinkedList<TextureIcon *> Icons;
 
 public:
-  Icon *add_new(string path, i32 x, i32 y);
+  TextureIcon *add_new(string path, i32 x, i32 y);
 
-  void foreach (std::function<void(Icon *)> func);
+  void foreach (std::function<void(TextureIcon *)> func);
 
-  void draw();
+  void draw(Rectangle *barFrame);
 };

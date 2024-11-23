@@ -2,23 +2,23 @@
 #include <raylib.h>
 
 // don't show this to anyone i beg of you
-void IconContainer::foreach (std::function<void(Icon *)> func) {
+void IconContainer::foreach (std::function<void(TextureIcon *)> func) {
   Icons.foreach (func);
 }
 
-void IconContainer::draw() {
+void IconContainer::draw(Rectangle *barFrame) {
 
-  Icons.foreach ([](Icon *icon) { icon->draw(); });
+  Icons.foreach ([barFrame](TextureIcon *icon) { icon->draw(barFrame); });
 }
-Icon *IconContainer::add_new(string path, i32 x, i32 y) {
+TextureIcon *IconContainer::add_new(string path, i32 x, i32 y) {
 
-  Icon *newIcon = new Icon(path, x, y);
+  TextureIcon *newIcon = new TextureIcon(path, x, y);
   auto ref = Icons.append(newIcon);
   newIcon->make_ref(ref);
   return newIcon;
 }
 
-GameObject *GameObjectContainer::add_new(Icon *icon, Camera2D *camera,
+GameObject *GameObjectContainer::add_new(TextureIcon *icon, Camera2D *camera,
                                          u8 Layer) {
   if (Layer >= Layers.size()) {
     for (i32 i = Layers.size(); i <= Layer; i++) {

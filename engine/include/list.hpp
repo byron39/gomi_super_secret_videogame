@@ -19,7 +19,6 @@ public:
     this->head->last = nullptr;
     this->head->next = nullptr;
     this->head->data = nullptr;
-    cout << "\nDLinkedList created \n" << endl;
   };
   void erase(node<T> *n) {
     n->last->next = n->next;

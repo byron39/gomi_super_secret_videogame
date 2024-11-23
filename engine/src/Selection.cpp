@@ -1,4 +1,5 @@
 #include "../include/Selection.hpp"
+#include <raylib.h>
 
 Selection::Selection(shared_ptr<GameObjectContainer> GOR,
                      shared_ptr<IconContainer> IR, Camera2D *cameraRef) {
@@ -10,17 +11,19 @@ Selection::Selection(shared_ptr<GameObjectContainer> GOR,
   isSelected = false;
 }
 
-void Selection::update(Rectangle *selectionWindow) {
+void Selection::update(Rectangle *selectionWindow, bool IconsSeletable) {
 
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !isSelected) {
     Vector2 Mouse = GetMousePosition();
-    Objects.foreach ([this, Mouse](Selectable *object) {
+    Objects.foreach ([this, Mouse, IconsSeletable](Selectable *object) {
       switch (object->type) {
       case ICON:
-        if (CheckCollisionPointRec(Mouse, ((Icon *)object->ptr)->scale)) {
-          this->Selected->ptr = (Selectable *)object->ptr;
-          this->Selected->type = ICON;
-          this->isSelected = true;
+        if (IconsSeletable) {
+          if (CheckCollisionPointRec(Mouse, ((TextureIcon *)object->ptr)->scale)) {
+            this->Selected->ptr = (Selectable *)object->ptr;
+            this->Selected->type = ICON;
+            this->isSelected = true;
+          }
         }
         break;
       case OBJECT:
@@ -43,9 +46,11 @@ void Selection::update(Rectangle *selectionWindow) {
     case ICON:
       if (!CheckCollisionPointRec(Mouse, *selectionWindow) &&
           CheckCollisionPointRec(Mouse, WindowRec)) {
-        auto p = (Icon *)Selected->ptr;
+        TextureIcon *p = (TextureIcon *)Selected->ptr;
         GameObjectsRef->add_new(p, camera, currentLayer);
         isSelected = false;
+        Selected->ptr = nullptr;
+        Selected->key = nullptr;
       }
       break;
     case OBJECT:
@@ -54,3 +59,5 @@ void Selection::update(Rectangle *selectionWindow) {
     }
   }
 }
+
+Selection::~Selection() { delete Selected; }

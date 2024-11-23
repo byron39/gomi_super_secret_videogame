@@ -6,6 +6,7 @@
 #include "list.hpp"
 #include "types.hpp"
 #include "utils.hpp"
+#include "windowbar.hpp"
 #include <functional>
 #include <raylib.h>
 
@@ -15,6 +16,8 @@ class EngineState {
   unique_ptr<Selection> selection;
   Rectangle selectionWindow;
   Camera2D SceneCam;
+  Camera2D UICam;
+  WindowBar Bar;
 
 public:
   EngineState();
