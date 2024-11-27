@@ -14,11 +14,11 @@ public:
   Rectangle matrix;
   Vector2 scale;
   f32 rotation;
-  boost::optional<Collider> collider;
+  Collider collider;
   string texture_path;
   Texture *texture;
   u64 UID;
-  u8 LayerID;
+  u8 layer_id;
   node<GameObject *> *ObjectListKey;
 
   GameObject(Vector2 pos, Texture *textureRef, string &textPath, u8 Layer);
