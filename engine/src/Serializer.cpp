@@ -167,7 +167,12 @@ enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_co
                         if (obj->ObjectListKey->next->data) {
                             // If next object specified, then reference its TOML UID (which may be re-written during TOML injest loading)
                             GameObject const * obj_next = obj->ObjectListKey->next->data;
-                            elm.insert("ObjectListKey.next.data.UID", obj_next->UID);
+
+                            i64 uid_packed;
+                            static_assert(sizeof(uid_packed) == sizeof(obj_next->UID));
+                            memcpy(&uid_packed, &obj_next->UID, sizeof(obj_next->UID));
+
+                            elm.insert("ObjectListKey.next.data.UID", uid_packed);
                         }
                     }
                 }
