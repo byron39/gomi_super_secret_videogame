@@ -13,7 +13,7 @@ public:
   string text;
   i32 fontsize;
   Texture texture;
-  i32 BorderThickness;
+  i32 border_thickness;
   node<TextureIcon *> *ref;
 
   void draw(Rectangle *barFrame);

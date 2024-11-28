@@ -6,25 +6,6 @@
 #include <../include/toml.hpp>
 
 /**
- * @brief Private sub-helper, due to multiple objects can contain this type
- *
- * @param tx_obj
- * @return Toml::Table
- */
-static auto FromGlTextureIntoToml(Texture const & tx_obj, int imid) {
-    // Given Texture{} raylib.h
-    // Return toml::table{} instance
-    auto tex_arr = toml::table{};
-    tex_arr.insert("gl_id",   tx_obj.id);  // not needed, just debug
-    tex_arr.insert("texture_imid", imid);
-    tex_arr.insert("width",   tx_obj.width);
-    tex_arr.insert("height",  tx_obj.width);
-    tex_arr.insert("mipmaps", tx_obj.mipmaps);
-    tex_arr.insert("format",  tx_obj.format);
-    return tex_arr;
-}
-
-/**
  * @brief Create TOML of loaded items
  *
  * @note layout:
@@ -45,10 +26,11 @@ static auto FromGlTextureIntoToml(Texture const & tx_obj, int imid) {
  * - https://marzer.github.io/tomlplusplus/#mainpage-example-serialization
  * - https://godbolt.org/z/jbG1o4sd1
  */
-enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_cont, IconContainer& icon_cont /*, &ShaderIcon shade_cont*/) {
+void Serializer::ToToml(GameObjectContainer& g_obj_cont, IconContainer& icon_cont /*, &ShaderIcon shade_cont*/) {
     auto doc = toml::table{};     // Final TOML document
     auto go_arr = toml::array{};  // List of GameObject items, can reference tx_arr[] or im_arr[] item indexes
     auto tx_arr = toml::array{};  // List of texture instances and metadata, can reference im_arr[] item indexes
+    auto ic_arr = toml::array{};  // List of TextureIcon items, can reference tx_arr items
     int  tx_count = 0;
     auto im_arr = toml::array{};  // Deduplicated list of texture resources
     int  im_count = 0;
@@ -59,7 +41,7 @@ enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_co
     } TextSerList;
     std::vector<TextSerList> texture_list;  // Used for deduplicating textures
 
-    {   // Lambda captures
+    {   // For each GameObject, capture lambda scope and possibly deduplicate while inserting
         auto go_arr_ref   = &go_arr;
         auto tx_arr_ref   = &tx_arr;
         auto tex_arr_ref  = &texture_list;
@@ -67,7 +49,7 @@ enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_co
         auto tx_count_ref = &tx_count;
         g_obj_cont.foreach ([&go_arr_ref, &tx_arr_ref, &tex_arr_ref, &im_count_ref, &tx_count_ref](GameObject *obj) {
             auto elm = toml::table{};
-            {   // .matrix
+            {   // .matrix (Rectangle)
                 auto mat_arr = toml::array{};
                 mat_arr.emplace_back(obj->matrix.x);
                 mat_arr.emplace_back(obj->matrix.y);
@@ -75,16 +57,16 @@ enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_co
                 mat_arr.emplace_back(obj->matrix.height);
                 elm.insert("matrix", mat_arr);
             }
-            {   // .scale
+            {   // .scale (Vector2)
                 auto sc_arr = toml::array{};
                 sc_arr.emplace_back(obj->scale.x);
                 sc_arr.emplace_back(obj->scale.y);
                 elm.insert("scale", sc_arr);
             }
-            {   // .rotation
+            {   // .rotation (f32)
                 elm.insert("rotation", obj->rotation);
             }
-            {   // .collider
+            {   // .collider (Collider)
                 auto coll_obj = toml::table{};
                 coll_obj.insert("type", obj->collider.type);
                 switch(obj->collider.type) {
@@ -151,17 +133,28 @@ enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_co
                         elm.insert("texture_txid", (*tx_count_ref));
 
                         // Second, insert new texture metadata instance into seperate serialization section for later ref of im_ind
-                        tx_arr_ref->emplace_back(FromGlTextureIntoToml((Texture const &)obj->texture, im_ind));
+                        {
+                            // Given Texture{} raylib.h
+                            auto tex_arr = toml::table{};
+                            tex_arr.insert("texture_txid", (*tx_count_ref));   // Debug info
+                            tex_arr.insert("texture_imid", im_ind);
+                            tex_arr.insert("gl_id",        obj->texture->id);  // Debug info
+                            tex_arr.insert("width",        obj->texture->width);
+                            tex_arr.insert("height",       obj->texture->width);
+                            tex_arr.insert("mipmaps",      obj->texture->mipmaps);
+                            tex_arr.insert("format",       obj->texture->format);
+                            tx_arr_ref->emplace_back(tex_arr);
+                        }
 
                         // Increment last populated index, into new total count
                         (*tx_count_ref)++;
                     }
                 }
             }
-            {   // .layer_id
+            {   // .layer_id (u8)
                 elm.insert("layer_id", obj->layer_id);
             }
-            {   // .ObjectListKey.next != None
+            {   // .ObjectListKey.next != None (ref to GameObject)
                 if (obj->ObjectListKey) {
                     if (obj->ObjectListKey->next) {
                         if (obj->ObjectListKey->next->data) {
@@ -181,39 +174,133 @@ enum Serializer::SerializerCode Serializer::ToToml(GameObjectContainer& g_obj_co
         });
     }
 
-    icon_cont.foreach ([](TextureIcon *ico) {
+    {   // For each TextureIcon, capture lambda scope and possibly deduplicate while inserting
+        auto ic_arr_ref = &ic_arr;
+        auto im_count_ref = &im_count;
+        auto tx_count_ref = &tx_count;
+        auto tex_arr_ref  = &texture_list;
+        auto tx_arr_ref   = &tx_arr;
+        icon_cont.foreach ([&ic_arr_ref, &im_count_ref, &tx_count_ref, &tex_arr_ref, &tx_arr_ref](TextureIcon *ico) {
+            auto elm = toml::table{};
 
-        printf("TextureIcon()\n");
-        printf(".scale %f %f %f %f\n", ico->scale.x, ico->scale.y, ico->scale.width, ico->scale.height);
-        printf(".text `%s`\n", ico->text.c_str());
-        printf(".fontsize %d\n", ico->fontsize);
-        printf(".texture %d\n", ico->texture.id);
+            {   // .scale (Rectangle)
+                auto sc_arr = toml::array{};
+                sc_arr.emplace_back(ico->scale.x);
+                sc_arr.emplace_back(ico->scale.y);
+                sc_arr.emplace_back(ico->scale.width);
+                sc_arr.emplace_back(ico->scale.height);
+                elm.insert("scale", sc_arr);
+            }
+            // handle .text later with .texture, as second to last
+            {   // .fontsize (i32)
+                elm.insert("fontsize", ico->fontsize);
+            }
+            {   // .border_thickness (i32)
+                elm.insert("border_thickness", ico->border_thickness);
+            }
+            {   // .text and .texture
+                // If texture path populated in engine structure
+                if (ico->text.size() > 0) {
+                    int im_ind = 0;
+                    {   // Handle inserting/deduplicating texture resources
+                        // Search for item, if not contained append it
+                        for (; im_ind < tex_arr_ref->size(); im_ind++) {
+                            if ((*tex_arr_ref)[im_ind].t_name == ico->text) {
+                                break;
+                            }
+                        }
 
-        if ((ico->ref) && (ico->ref->next)) {
-            printf(".next %d\n", ico->ref->data->texture.id);  // Texture{} raylib.h
-        } else {
-            printf(".texture NA\n");
+                        if (im_ind < tex_arr_ref->size()) {
+                            // Reference texture resource index
+                            elm.insert("texture_imid", im_ind);
+                            (*tex_arr_ref)[im_ind].tid_arr.push_back(im_ind);
+                        } else {
+                            // Insert new item into list of texture resources
+                            elm.insert("texture_imid", im_ind);  // text_arr_ref->size()
+                            tex_arr_ref->push_back({ico->text, {}});
+                            (*im_count_ref)++;
+                        }
+                    }
+
+                    // If associated texture instance exists, assume only exists when resource reference exists (text != None)
+                    if (&ico->texture) {  // Always true as in contained
+                        // At least one Texture{} struct also has position metadata in refrence to the populated texture_list[] resource
+                        // This is assumed to be a new Texture{} instance, so for now no dedup implemented on these types
+
+                        // First, insert texture metadata ref/index into current GameObject
+                        elm.insert("texture_txid", (*tx_count_ref));
+
+                        // Second, insert new texture metadata instance into seperate serialization section for later ref of im_ind
+                        {
+                            // Given Texture{} raylib.h
+                            auto tex_arr = toml::table{};
+                            tex_arr.insert("texture_txid", (*tx_count_ref));  // Debug info
+                            tex_arr.insert("texture_imid", im_ind);
+                            tex_arr.insert("gl_id",        ico->texture.id);  // Debug info
+                            tex_arr.insert("width",        ico->texture.width);
+                            tex_arr.insert("height",       ico->texture.width);
+                            tex_arr.insert("mipmaps",      ico->texture.mipmaps);
+                            tex_arr.insert("format",       ico->texture.format);
+                            tx_arr_ref->emplace_back(tex_arr);
+                        }
+
+                        // Increment last populated index, into new total count
+                        (*tx_count_ref)++;
+                    }
+                }
+            }
+            // handle ._.next last
+            {   // .TextureIcon.next != None (ref to TextureIcon)
+                if (ico->ref) {
+                    if (ico->ref->next) {
+                        if (ico->ref->next->data) {
+                            // If next object specified, then reference its TOML UID (which may be re-written during TOML injest loading)
+                            TextureIcon const * ico_next = ico->ref->next->data;
+                            // Does not have .UID like GameObject, so for (debug) info show next texture resource location contained by linked list
+                            elm.insert("TextureIcon.next.data.text", ico_next->text);
+                        }
+                    }
+                }
+            }
+            ic_arr_ref->emplace_back(elm);
+        });
+    }
+
+    {   // For each possibly deduplicated resource (texture_list/im_arr) insert into seralization queue now
+        int count = 0;
+        for (auto t : texture_list) {
+            auto t_and_tids = toml::table{};
+            t_and_tids.insert("texture_imid", count);  // Debug info
+            t_and_tids.insert("t_name", t.t_name);
+            {
+                auto tid_arr = toml::array{};
+                for (auto r : t.tid_arr) {
+                    tid_arr.emplace_back(r);
+                }
+                t_and_tids.insert("tid_arr", tid_arr);
+            }
+            count++;
+            im_arr.emplace_back(t_and_tids);
         }
-
-        printf(".BorderThickness %d\n", ico->BorderThickness);
-    });
-
-    //ShaderIcon const * sh =
-    //for (auto shade : shade_cont) {
-    //    shade_cont;
-    //}
+    }
 
     // Be nice and list/serialize raw external resources first before anything that might reference them
+    // But the toml++ serializer doesn't respect insertion order???
     // ...
-    doc.insert("im_arr", im_arr);
-    doc.insert("tx_arr", tx_arr);
     doc.insert("go_arr", go_arr);
+    doc.insert("ic_arr", ic_arr);
+    doc.insert("tx_arr", tx_arr);
+    doc.insert("im_arr", im_arr);
     std::cout << doc << "\n\n";
+    std::ofstream fout("engine_out_state.toml");
+    fout << doc;
+    fout << std::endl;
+    fout.close();
 
-    return serializer_ok;
+    return;
 }
 
-enum Serializer::SerializerCode Serializer::FromToml(void) {
+void Serializer::FromToml(void) {
     // Walk inputs and append if not already found
-    return serializer_parsing_err;
+    return;
 }
