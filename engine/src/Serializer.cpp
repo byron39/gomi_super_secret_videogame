@@ -94,8 +94,8 @@ void Serializer::ToToml(GameObjectContainer& g_obj_cont, IconContainer& icon_con
                         coll_obj.insert("height", ((rectangle*)&obj->collider)->height);
                         break;
                     }
-                    default:
                     case ColliderType::NONE:
+                    default:
                         break;
                 }
                 elm.insert("collider", coll_obj);
@@ -103,16 +103,16 @@ void Serializer::ToToml(GameObjectContainer& g_obj_cont, IconContainer& icon_con
             {   // .texture_path and .texture
                 // If texture path populated in engine structure
                 if (obj->texture_path.size() > 0) {
-                    int im_ind = 0;
+                    long im_ind = 0;
                     {   // Handle inserting/deduplicating texture resources
                         // Search for item, if not contained append it
-                        for (; im_ind < tex_arr_ref->size(); im_ind++) {
+                        for (; im_ind < (long)tex_arr_ref->size(); im_ind++) {
                             if ((*tex_arr_ref)[im_ind].t_name == obj->texture_path) {
                                 break;
                             }
                         }
 
-                        if (im_ind < tex_arr_ref->size()) {
+                        if (im_ind < (long)tex_arr_ref->size()) {
                             // Reference texture resource index
                             elm.insert("texture_imid", im_ind);
                             (*tex_arr_ref)[im_ind].tid_arr.push_back(im_ind);
@@ -201,16 +201,16 @@ void Serializer::ToToml(GameObjectContainer& g_obj_cont, IconContainer& icon_con
             {   // .text and .texture
                 // If texture path populated in engine structure
                 if (ico->text.size() > 0) {
-                    int im_ind = 0;
+                    long im_ind = 0;
                     {   // Handle inserting/deduplicating texture resources
                         // Search for item, if not contained append it
-                        for (; im_ind < tex_arr_ref->size(); im_ind++) {
+                        for (; im_ind < (long)tex_arr_ref->size(); im_ind++) {
                             if ((*tex_arr_ref)[im_ind].t_name == ico->text) {
                                 break;
                             }
                         }
 
-                        if (im_ind < tex_arr_ref->size()) {
+                        if (im_ind < (long)tex_arr_ref->size()) {
                             // Reference texture resource index
                             elm.insert("texture_imid", im_ind);
                             (*tex_arr_ref)[im_ind].tid_arr.push_back(im_ind);

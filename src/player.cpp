@@ -34,6 +34,8 @@ void Player::update() {
       src.y = 1152;
     case RIGHT:
       src.y = 1216;
+    default:
+      break;
     }
 
     if (animation_cooldown == animation_interval) {
@@ -79,6 +81,8 @@ void Player::update() {
         break;
       case RIGHT:
         src.y = 706;
+        break;
+      default:
         break;
       }
 

@@ -54,7 +54,7 @@ public:
     this->map = std::make_unique<Map>();
     camera.zoom = 1;
     camera.rotation = 0;
-    camera.offset = {screenWidth / 2.0, screenHeight / 2.0};
+    camera.offset = {(float)(screenWidth / (double)2.0), (float)(screenHeight / (double)2.0)};
 
     this->loop();
   }

@@ -26,7 +26,7 @@ void Selection::update(Rectangle *selectionWindow, bool IconsSeletable) {
           }
         }
         break;
-      case OBJECT:
+      case OBJECT: {
         GameObject *p = (GameObject *)object->ptr;
         if (CheckCollisionPointRec(Mouse, p->matrix)) {
           this->Selected->ptr = (Selectable *)object->ptr;
@@ -34,6 +34,9 @@ void Selection::update(Rectangle *selectionWindow, bool IconsSeletable) {
           this->Selected->key = object->key;
           this->isSelected = true;
         }
+        break;
+      }
+      default:
         break;
       }
     });
@@ -54,7 +57,8 @@ void Selection::update(Rectangle *selectionWindow, bool IconsSeletable) {
       }
       break;
     case OBJECT:
-
+      break;
+    default:
       break;
     }
   }

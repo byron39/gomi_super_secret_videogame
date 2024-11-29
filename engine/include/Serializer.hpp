@@ -6,5 +6,5 @@ private:
   //
 public:
   static void ToToml(GameObjectContainer& g_obj_cont, IconContainer& icon_cont /*, &ShaderIcon shade_cont*/);
-  static void FromToml(void);
+  static void FromToml(void /*GameObjectContainer& g_obj_cont, IconContainer& icon_cont */ /*, &ShaderIcon shade_cont*/);
 };
