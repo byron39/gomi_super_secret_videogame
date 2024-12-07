@@ -359,7 +359,7 @@
 #endif
 #endif
 
-// TOML_COMPILER_HAS_EXCEPTIONS
+#define TOML_COMPILER_HAS_EXCEPTIONS 0
 #ifndef TOML_COMPILER_HAS_EXCEPTIONS
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND) || defined(__cpp_exceptions)
 #define TOML_COMPILER_HAS_EXCEPTIONS 1

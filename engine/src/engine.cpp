@@ -70,9 +70,24 @@ EngineState::EngineState() {
 }
 
 EngineState::~EngineState() {
+  GameObjectContainer g_load;
+  IconContainer       i_load;
+#if 0
+  std::string tomlfile = "engine_out_state.toml";
+  std::string tomlreout = "engine_in_state.toml";
 
-  Serializer::ToToml(*this->Objects.get(), *this->icons.get());
+  Serializer::ToToml(tomlfile, *this->Objects.get(), *this->icons.get());
 
+#if 0
+  bool in = Serializer::FromToml(tomlfile, g_load, i_load);
+  std::cout << "Loading Result: " << in << std::endl;
+#endif
+  Serializer::ToToml(tomlreout, g_load, i_load);
+#endif
+  GameObjectContainer const * g[2] = {&*this->Objects.get(), &g_load};
+  IconContainer const * i[2] = {&*this->icons.get(), &i_load};
+  bool ok = Serializer::VerifyLoad(g, i);
+  std::cout << "Verify Load Status: " << ok << std::endl;
 
   this->selection.reset();
   this->Objects->foreach ([](GameObject *obj) {
@@ -100,6 +115,11 @@ void EngineState::loop() {
       SceneCam.target.x -= GetMouseDelta().x;
       SceneCam.target.y -= GetMouseDelta().y;
     }
+
+    //if (IsKeyPressed(KEY_ESCAPE))
+    //{
+    //  glfwSetWindowShouldClose(&selectionWindow, GL_TRUE);
+    //}
 
     Bar.update();
 
