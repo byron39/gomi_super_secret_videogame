@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add compile options
-add_compile_options(-g)
+add_compile_options(-g -O0)
 
 # GCC Diagnostics
 add_compile_options(
@@ -188,6 +188,8 @@ add_compile_options(
     #-Wredundant-decls                # toml.hpp?
     #-Wshadow                         # toml.hpp?
     #-Wsuggest-override               # toml.hpp?
+    -Wno-unused-parameter
+    -Wno-unused-variable
 )
 
 # GCC/CMake C++ Items to explicitly allow

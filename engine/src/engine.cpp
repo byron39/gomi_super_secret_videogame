@@ -72,13 +72,13 @@ EngineState::EngineState() {
 EngineState::~EngineState() {
   GameObjectContainer g_load;
   IconContainer       i_load;
-#if 0
+#if 1
   std::string tomlfile = "engine_out_state.toml";
   std::string tomlreout = "engine_in_state.toml";
 
   Serializer::ToToml(tomlfile, *this->Objects.get(), *this->icons.get());
 
-#if 0
+#if 1
   bool in = Serializer::FromToml(tomlfile, g_load, i_load);
   std::cout << "Loading Result: " << in << std::endl;
 #endif

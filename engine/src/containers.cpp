@@ -36,7 +36,7 @@ GameObject *GameObjectContainer::add_new(TextureIcon *icon, Camera2D *camera,
 
 void GameObjectContainer::foreach (std::function<void(GameObject *)> func) {
   for (auto layer : Layers) {
-    layer->foreach (func);
+    layer->foreach (func);  // Use std::for_each ?
   }
 }
 
