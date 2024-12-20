@@ -73,7 +73,7 @@ bool Serializer::ToToml(std::string const & outfile, GameObjectContainer& g_obj_
             }
             {   // .scale (Vector2)
                 auto sc_arr = toml::array{};
-                sc_arr.emplace_back(obj->scale.x);
+                sc_arr.emplace_back(obj->scale.x);  // TODO: Remove unused
                 sc_arr.emplace_back(obj->scale.y);
                 elm.insert("scale", sc_arr);
             }
@@ -319,31 +319,26 @@ bool Serializer::ToToml(std::string const & outfile, GameObjectContainer& g_obj_
     return !fout.is_open();
 }
 
-#if 0
-bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj_cont, IconContainer& icon_cont /*, &ShaderIcon shade_cont*/) {
+
+
+
+
+
+
+
+
+bool Serializer::FromToml(
+    std::string const & infile,
+    Camera2D *camera /* FIXME Camera2D[] and pick by GameObject camera id ? */,
+    GameObjectContainer& g_obj_cont,
+    IconContainer& icon_cont
+    /*, &ShaderIcon shade_cont*/)
+{
+    std::cout << "...FromToml[0]" << std::endl;
     // Walk inputs and append if not already found
     toml::parse_result loadfile = toml::parse_file(infile);
     if (!loadfile) return false;
-
-    return true;
-}
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
-bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj_cont, IconContainer& icon_cont /*, &ShaderIcon shade_cont*/) {
-    // Walk inputs and append if not already found
-    toml::parse_result loadfile = toml::parse_file(infile);
-    if (!loadfile) return false;
+    std::cout << "...FromToml[1]" << std::endl;
     //std::cout << toml::json_formatter{ loadfile } << std::endl;
 
     // Need to loop over GameObject, which can require finding a Texture, which can require finding an image
@@ -362,6 +357,8 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
         float matrix_y;
         float matrix_width;
         float matrix_height;
+        float scale_x;
+        float scale_y;
         float rotation;
         u8    collider_type;
         float collider_center_x;
@@ -371,6 +368,8 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
         i32   collider_left;
         i32   collider_width;
         i32   collider_height;
+        i64 texture_img_id;
+        i64 texture_obj_id;
         std::vector<Vector2> vertecies;
         GameObject* inst_ptr;
     } ParseGameObject;
@@ -383,6 +382,7 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
         i32   fontsize;
         i32   border_thickness;
         i64   texture_img_id;
+        i64   texture_obj_id;
     } ParseIconObj;
     typedef struct {
         i64 self_id;
@@ -397,28 +397,28 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
         int height;
         int mipmaps;
         int format;
-        Texture* inst_ptr;
+        TextureIcon* inst_ptr;
     } ParseTextureObj;
     std::vector<ParseGameObject>    toml_tmp_game_obj_list;
     std::vector<ParseIconObj>       toml_tmp_icon_obj_list;
     std::vector<ParseImageLocation> toml_tmp_img_obj_list;
     std::vector<ParseTextureObj>    toml_tmp_texture_obj_list;
 
-    // Start finding TOML items
-    toml::table doc = loadfile.table();
-    {
+    {   // Start finding TOML items
+        toml::table doc = loadfile.table();
         {   // GameObject{}
+            std::cout << "...FromToml[2]" << std::endl;
             toml::array* arr = doc.get_as<toml::array>(std::string_view("game_obj_arr"));
             if (!arr) return false;
+
+            std::cout << "...FromToml[3]" << std::endl;
             bool inner_ok = true;
             i64 obj_ind = 0;
             arr->for_each(
                 [&obj_ind, &toml_tmp_game_obj_list, &inner_ok]
                 (toml::table& nth_obj)
             {
-                i64 obj_num = nth_obj["texture_obj_id"].value_or(-1);
-                inner_ok &= (obj_num == obj_ind);
-
+                std::cout << "...FromToml[3] " << obj_ind << std::endl;
                 std::vector<Vector2> vertecies;
                 toml::array* verts = nth_obj.get_as<toml::array>(std::string_view("vertecies"));
                 if (verts) {
@@ -435,12 +435,14 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
 
                 toml_tmp_game_obj_list.emplace_back(
                     // ParseGameObject{}
-                    obj_num,  // self_id
+                    obj_ind,  // self_id
                     nth_obj["layer_id"].value_or(-1),
                     nth_obj["matrix"]["x"].value_or(NAN),
                     nth_obj["matrix"]["y"].value_or(NAN),
                     nth_obj["matrix"]["width"].value_or(NAN),
                     nth_obj["matrix"]["height"].value_or(NAN),
+                    nth_obj["scale"][0].value_or(NAN),
+                    nth_obj["scale"][1].value_or(NAN),
                     nth_obj["rotation"].value_or(NAN),
                     nth_obj["collider"]["type"].value_or((u8)~0),
                     nth_obj["collider"]["center"]["x"].value_or(NAN),
@@ -450,17 +452,23 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
                     nth_obj["collider"]["left"].value_or(-1),
                     nth_obj["collider"]["width"].value_or(-1),
                     nth_obj["collider"]["height"].value_or(-1),
+                    nth_obj["texture_img_id"].value_or(-1),
+                    nth_obj["texture_obj_id"].value_or(-1),
                     vertecies,
                     nullptr
                 );
                 obj_ind++;
             });
+            std::cout << "...FromToml[4]" << std::endl;
             if (!inner_ok) return false;
         }
 
         {   // Icon{}
+            std::cout << "...FromToml[5]" << std::endl;
             toml::array* arr = doc.get_as<toml::array>(std::string_view("icon_obj_arr"));
             if (!arr) return false;
+
+            std::cout << "...FromToml[6]" << std::endl;
             bool inner_ok = true;
             i64 ico_ind = 0;
             arr->for_each(
@@ -468,7 +476,7 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
                 (toml::table& nth_obj)
             {
                 i64 ico_num = nth_obj["texture_obj_id"].value_or(-1);
-                inner_ok &= (ico_num == ico_ind);
+                std::cout << "...FromToml[7] " << ico_ind << " ?= " << ico_num << std::endl;
 
                 toml_tmp_icon_obj_list.emplace_back(
                     // ParseIconObj
@@ -479,22 +487,28 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
                     nth_obj["scale"]["height"].value_or(NAN),
                     nth_obj["fontsize"].value_or(INT32_MAX),
                     nth_obj["border_thickness"].value_or(INT32_MAX),
-                    nth_obj["texture_img_id"].value_or(INT32_MAX)
+                    nth_obj["texture_img_id"].value_or(INT32_MAX),
+                    nth_obj["texture_obj_id"].value_or(INT32_MAX)
                 );
                 ico_ind++;
             });
+            std::cout << "...FromToml[8]" << std::endl;
             if (!inner_ok) return false;
         }
 
         {   // Image location (as std::string)
+            std::cout << "...FromToml[9]" << std::endl;
             toml::array* arr = doc.get_as<toml::array>(std::string_view("icon_obj_arr"));
             if (!arr) return false;
+
+            std::cout << "...FromToml[10]" << std::endl;
             bool inner_ok = true;
             i64 img_ind = 0;
             arr->for_each(
                 [&toml_tmp_img_obj_list, &img_ind, &inner_ok]
                 (toml::table& nth_obj)
             {
+                std::cout << "...FromToml[11] " << img_ind << std::endl;
                 i64 itm_ind = nth_obj["texture_img_id"].value_or(-1);
                 inner_ok &= (img_ind == itm_ind);
 
@@ -517,12 +531,16 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
                 );
                 img_ind++;
             });
+            std::cout << "...FromToml[12]" << std::endl;
             if (!inner_ok) return false;
         }
 
         {   // Texture{}
+            std::cout << "...FromToml[13]" << std::endl;
             toml::array* arr = doc.get_as<toml::array>(std::string_view("texture_obj_arr"));
             if (!arr) return false;
+
+            std::cout << "...FromToml[14]" << std::endl;
             bool inner_ok = true;
             i64 tex_ind = 0;
             arr->for_each(
@@ -530,6 +548,8 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
                 (toml::table& nth_obj)
             {
                 i64 tex_num = nth_obj["texture_obj_id"].value_or(-1);
+                //std::cout << nth_obj << std::endl;
+                std::cout << "...FromToml[15] " << tex_ind << " ?= " << tex_num << std::endl;
                 inner_ok &= (tex_num == tex_ind);
 
                 toml_tmp_texture_obj_list.emplace_back(
@@ -542,40 +562,138 @@ bool Serializer::FromToml(std::string const & infile, GameObjectContainer& g_obj
                     nth_obj["format"].value_or(-1),
                     nullptr
                 );
+                tex_ind++;
             });
+            std::cout << "...FromToml[16]" << std::endl;
             if (!inner_ok) return false;
         }
     }
 
-    // The Texture{} contains instances of Icon{} and image location (std::string) if required, and Texture{} is placed inside TextureContainer{}
-    // The GameObject{} inside GameObjectContainer{} may use by ref pre-existing Texture{} elements
+    {   // Populate argument structures with toml info
+        {   // Texture{} contains instances of Icon{} and image location (std::string) if required, and Texture{} is placed inside TextureContainer{}
+            std::cout << "...FromToml[17]" << std::endl;
+            bool inner_ok = true;
+            std::for_each(toml_tmp_icon_obj_list.begin(), toml_tmp_icon_obj_list.end(),
+                [&icon_cont, &toml_tmp_img_obj_list, &toml_tmp_texture_obj_list, &inner_ok]
+                (ParseIconObj& icon_info)
+            {
+                i64 img_ind = icon_info.texture_img_id;
+                std::cout << "...FromToml[18.1] " << img_ind << " --> " << inner_ok << std::endl;
+                if ((i64)toml_tmp_img_obj_list.size() <= img_ind) { inner_ok = false; return; }
+                std::string& img_name_ref = toml_tmp_img_obj_list[img_ind].t_name;
 
-#if 0
-    toml_tmp_texture_obj_list.for_each(
-        []
-        (&texture_info)
-    {
-        i64 img_ind = texture_info.img_id;
-        if (toml_tmp_img_obj_list.size() >= img_ind) return false;
-        std::string& img_name_ref = toml_tmp_img_obj_list[img_ind];
+                i64 tex_ind = icon_info.texture_obj_id;
+                std::cout << "...FromToml[18.2] " << img_ind << " --> " << inner_ok << std::endl;
+                if ((i64)toml_tmp_texture_obj_list.size() <= tex_ind) { inner_ok = false; return; }
+                ParseTextureObj& tex_info_ref = toml_tmp_texture_obj_list[tex_ind];
+                std::cout << "...FromToml[18.3] " << img_ind << " --> " << inner_ok << std::endl;
+                if (tex_info_ref.img_id != img_ind) { inner_ok = false; return; }
+                std::cout << "...FromToml[18.4] " << img_ind << " --> " << inner_ok << std::endl;
 
-        //TextureIcon *IconContainer::add_new(string path, i32 x, i32 y)
-        Texture* tex_ptr = icon_cont.add_new(img_name_ref, )
-    });
-    icon_cont.
-    // loop
-#endif
-    (void)g_obj_cont;
-    (void)icon_cont;
+                //TextureIcon *IconContainer::add_new(string path, i32 x, i32 y)
+                // Rectangle scale;
+                // string text;
+                // i32 fontsize;
+                // Texture texture;
+                //     unsigned int id;
+                //     int width;
+                //     int height;
+                //     int mipmaps;
+                //     int format;
+                // i32 border_thickness;
+                TextureIcon* ico_ptr = icon_cont.add_new(img_name_ref, icon_info.scale_x, icon_info.scale_y);
+                ico_ptr->scale.x          = icon_info.scale_x;  // Required due to lossy float->int->float conversion
+                ico_ptr->scale.y          = icon_info.scale_y;  // ...
+                ico_ptr->scale.width      = icon_info.scale_width;
+                ico_ptr->scale.height     = icon_info.scale_height;
+                //ico_ptr->text             = img_name_ref;
+                ico_ptr->fontsize         = icon_info.fontsize;
+                //ico_ptr->texture.id       = tex_info_ref.gl_id;  // Auto-set based on runtime insertion ordering, not required to be restored
+                ico_ptr->texture.width    = tex_info_ref.width;   // Required due to lossy int->float->int conversion
+                ico_ptr->texture.height   = tex_info_ref.height;  // ...
+                ico_ptr->texture.mipmaps  = tex_info_ref.mipmaps;
+                //ico_ptr->texture.format   = tex_info_ref.format;  // Should be set on image load?
+                ico_ptr->border_thickness = icon_info.border_thickness;
+
+                // Note where constructed for when other objects (GameObject{}) need its ptr
+                tex_info_ref.inst_ptr     = ico_ptr;
+            });
+            std::cout << "...FromToml[19] " << inner_ok << std::endl;
+            if (!inner_ok) return false;
+        }
+
+        {   // GameObject{} in GameObjectContainer{} might init with previous Texture{} refs
+            std::cout << "...FromToml[20]" << std::endl;
+            bool inner_ok = true;
+            std::for_each(toml_tmp_game_obj_list.begin(), toml_tmp_game_obj_list.end(),
+                [&camera, &g_obj_cont, &toml_tmp_texture_obj_list, &inner_ok]
+                (ParseGameObject& game_info)
+            {
+                TextureIcon* tex_info_ref = toml_tmp_texture_obj_list[game_info.texture_obj_id].inst_ptr;
+                if (!tex_info_ref) { inner_ok = false; return; }  // In theory it is possible this is allowed to be nullptr ?
+                std::cout << "...FromToml[21]" << std::endl;
+
+                //GameObject *add_new(TextureIcon *icon, Camera2D *camera, u8 Layer);
+                // Rectangle matrix;
+                // Vector2 scale;
+                // f32 rotation;
+                // Collider collider;
+                // string texture_path;
+                // Texture *texture;
+                // u64 UID;
+                // u8 layer_id;
+                GameObject* gam_ptr = g_obj_cont.add_new(tex_info_ref, camera, (u8)~0);
+                gam_ptr->matrix.x      = game_info.matrix_x;
+                gam_ptr->matrix.y      = game_info.matrix_y;
+                gam_ptr->matrix.width  = game_info.matrix_width;
+                gam_ptr->matrix.height = game_info.matrix_height;
+                gam_ptr->scale.x       = game_info.scale_x;
+                gam_ptr->scale.y       = game_info.scale_y;
+                gam_ptr->rotation      = game_info.rotation;
+                switch (game_info.collider_type) {
+                    case NONE:
+                        gam_ptr->collider = {};
+                        ((None*)&gam_ptr->collider)->type = (ColliderType)game_info.collider_type;
+                        break;
+                    case POLYGON:
+                        gam_ptr->collider = {};
+                        ((Polygon*)&gam_ptr->collider)->type = (ColliderType)game_info.collider_type;
+                        for (Vector2 pair : game_info.vertecies ) {
+                            ((Polygon*)&gam_ptr->collider)->vertecies.emplace_back(
+                                pair.x,
+                                pair.y
+                            );
+                        }
+                        break;
+                    case RECTANGLE:
+                        gam_ptr->collider = {};
+                        ((rectangle*)&gam_ptr->collider)->type = (ColliderType)game_info.collider_type;
+                        ((rectangle*)&gam_ptr->collider)->top    = game_info.collider_top;
+                        ((rectangle*)&gam_ptr->collider)->left   = game_info.collider_left;
+                        ((rectangle*)&gam_ptr->collider)->width  = game_info.collider_width;
+                        ((rectangle*)&gam_ptr->collider)->height = game_info.collider_height;
+                        break;
+                    case CIRCLE:
+                        gam_ptr->collider = {};
+                        ((Circle*)&gam_ptr->collider)->type = (ColliderType)game_info.collider_type;
+                        ((Circle*)&gam_ptr->collider)->center.x = game_info.collider_center_x;
+                        ((Circle*)&gam_ptr->collider)->center.y = game_info.collider_center_y;
+                        ((Circle*)&gam_ptr->collider)->radius   = game_info.collider_radius;
+                        break;
+                    default:
+                        inner_ok = false;
+                        return;
+                }
+                gam_ptr->texture_path  = tex_info_ref->text;  // TODO: Duplicate, is already inside TextureIcon{}.text
+                gam_ptr->texture       = &tex_info_ref->texture;
+                //gam_ptr->UID           = game_info.UID;  // Generated at runtime, unqiue per insertion, only for deduplication?
+                gam_ptr->layer_id      = game_info.layer_id;
+            });
+        }
+    }
+    std::cout << "...FromToml[22]" << std::endl;
     return true;
 }
-
-
-
-
-
-
-
 
 
 bool Serializer::VerifyLoad(GameObjectContainer const * g_obj_arr[2], IconContainer const * icon_obj_arr[2] /*, ShaderIcon const & shade_cont[2]*/) {
